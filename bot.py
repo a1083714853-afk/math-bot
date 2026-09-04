@@ -20,7 +20,7 @@ def run_health_check_server():
 threading.Thread(target=run_health_check_server, daemon=True).start()
 
 # --- 2. Bot Sozlamalari ---
-TOKEN = "8748063084:AAGAXuyD6krAGeL1ctleC5GMBDiz_jKSN4M"
+TOKEN = "8748063084:AAE0x_NIN7MbKu2vu9GeRC2xHUAUVyf6E0U"
 
 def misol_yaratish(sinf):
     if sinf in ["1-sinf", "2-sinf"]:
