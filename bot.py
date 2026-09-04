@@ -1,6 +1,5 @@
 import os
 import random
-import math
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
 from telegram import Update, ReplyKeyboardMarkup
@@ -30,7 +29,7 @@ def misol_yaratish(sinf):
         amal = random.choice(['+', '-'])
         if amal == '-' and a < b: a, b = b, a
         javob = a + b if amal == '+' else a - b
-        return f"{a} {amal} {b} = ?", str(javob)
+        savol = f"{a} {amal} {b} = ?"
 
     elif sinf in ["3-sinf", "4-sinf"]:
         amal = random.choice(['+', '-', '*', '/'])
@@ -45,7 +44,7 @@ def misol_yaratish(sinf):
             b = random.randint(2, 10)
             javob = random.randint(2, 10)
             a = b * javob
-        return f"{a} {amal} {b} = ?", str(javob)
+        savol = f"{a} {amal} {b} = ?"
 
     elif sinf in ["5-sinf", "6-sinf", "7-sinf", "8-sinf"]:
         tur = random.choice(["oddiy", "daraja"])
@@ -54,25 +53,37 @@ def misol_yaratish(sinf):
             amal = random.choice(['+', '-'])
             if amal == '-' and a < b: a, b = b, a
             javob = a + b if amal == '+' else a - b
-            return f"{a} {amal} {b} = ?", str(javob)
+            savol = f"{a} {amal} {b} = ?"
         else:
-            a = random.randint(2, 10)
-            b = random.randint(2, 3)
+            a, b = random.randint(2, 10), random.randint(2, 3)
             javob = a ** b
-            return f"{a}^{b} = ?", str(javob)
+            savol = f"{a}^{b} = ?"
 
     else:  # 9, 10, 11-sinflar
         tur = random.choice(["ildiz", "tenglama"])
         if tur == "ildiz":
             javob = random.randint(2, 15)
             a = javob ** 2
-            return f"√{a} = ?", str(javob)
+            savol = f"√{a} = ?"
         else:
-            # x + a = b
             x = random.randint(1, 20)
             a = random.randint(5, 30)
             b = x + a
-            return f"x + {a} = {b}\nx = ?", str(x)
+            javob = x
+            savol = f"x + {a} = {b}\nx = ?"
+
+    # 4 ta variant tayyorlash
+    variantlar = {javob}
+    while len(variantlar) < 4:
+        fark = random.choice([-3, -2, -1, 1, 2, 3, 4, 5])
+        notogri = javob + fark
+        if notogri >= 0:
+            variantlar.add(notogri)
+    
+    variant_list = [str(v) for v in variantlar]
+    random.shuffle(variant_list)
+    
+    return savol, str(javob), variant_list
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sinf_tugmalari = [
@@ -82,8 +93,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ["10-sinf", "11-sinf"]
     ]
     await update.message.reply_text(
-        "Salom! Matematika test botiga xush kelibsiz.\nSinfni tanlang:",
+        "Salom! O'zingizga mos sinfni tanlang:",
         reply_markup=ReplyKeyboardMarkup(sinf_tugmalari, resize_keyboard=True)
+    )
+
+async def misol_yuborish(update: Update, context: ContextTypes.DEFAULT_TYPE, sinf: str):
+    savol, javob, variantlar = misol_yaratish(sinf)
+    context.user_data["togri_javob"] = javob
+    context.user_data["variantlar"] = variantlar
+    
+    # Faqat 4 ta variant tugmasi va eng pastda sinfni o'zgartirish tugmasi
+    tugmalar = []
+    for v in variantlar:
+        tugmalar.append([v])
+    tugmalar.append(["Sinfni o'zgartirish 🔄"])
+
+    matn = f"<b>{sinf}</b>\n\nMisolni yeching va to'g'ri variantni tanlang:\n<b>{savol}</b>"
+    await update.message.reply_text(
+        matn,
+        parse_mode="HTML",
+        reply_markup=ReplyKeyboardMarkup(tugmalar, resize_keyboard=True)
     )
 
 async def javobni_tekshirish(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -92,32 +121,24 @@ async def javobni_tekshirish(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if matn in sinflar:
         context.user_data["sinf"] = matn
-        savol, javob = misol_yaratish(matn)
-        context.user_data["togri_javob"] = javob
-        
-        menyu = [["Sinfni o'zgartirish"]]
-        await update.message.reply_text(
-            f"Sinf: {matn}\n\nMisolni yeching:\n{savol}",
-            reply_markup=ReplyKeyboardMarkup(menyu, resize_keyboard=True)
-        )
+        await misol_yuborish(update, context, matn)
 
-    elif matn == "Sinfni o'zgartirish":
+    elif matn == "Sinfni o'zgartirish 🔄":
         await start(update, context)
 
     elif "togri_javob" in context.user_data:
         togri = context.user_data["togri_javob"]
+        variantlar = context.user_data.get("variantlar", [])
         sinf = context.user_data.get("sinf", "1-sinf")
 
-        if matn.strip() == togri:
-            await update.message.reply_text("To'g'ri! Barakalla! 🎉")
-        else:
-            await update.message.reply_text(f"Noto'g'ri. To'g'ri javob: {togri}")
-        
-        del context.user_data["togri_javob"]
-
-        savol, javob = misol_yaratish(sinf)
-        context.user_data["togri_javob"] = javob
-        await update.message.reply_text(f"Keyingi misol:\n\n{savol}")
+        if matn in variantlar:
+            if matn == togri:
+                await update.message.reply_text("To'g'ri! Barakalla! 🎉")
+            else:
+                await update.message.reply_text(f"Noto'g'ri ❌\nTo'g'ri javob: {togri}")
+            
+            # Javob bosilishi bilan avtomatik ravishda keyingi misol yuboriladi
+            await misol_yuborish(update, context, sinf)
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
