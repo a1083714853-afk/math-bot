@@ -72,7 +72,6 @@ def misol_yaratish(sinf):
             javob = x
             savol = f"x + {a} = {b}\nx = ?"
 
-    # 4 ta variant tayyorlash
     variantlar = {javob}
     while len(variantlar) < 4:
         fark = random.choice([-3, -2, -1, 1, 2, 3, 4, 5])
@@ -102,10 +101,7 @@ async def misol_yuborish(update: Update, context: ContextTypes.DEFAULT_TYPE, sin
     context.user_data["togri_javob"] = javob
     context.user_data["variantlar"] = variantlar
     
-    # Faqat 4 ta variant tugmasi va eng pastda sinfni o'zgartirish tugmasi
-    tugmalar = []
-    for v in variantlar:
-        tugmalar.append([v])
+    tugmalar = [[v] for v in variantlar]
     tugmalar.append(["Sinfni o'zgartirish 🔄"])
 
     matn = f"<b>{sinf}</b>\n\nMisolni yeching va to'g'ri variantni tanlang:\n<b>{savol}</b>"
@@ -134,11 +130,11 @@ async def javobni_tekshirish(update: Update, context: ContextTypes.DEFAULT_TYPE)
         if matn in variantlar:
             if matn == togri:
                 await update.message.reply_text("To'g'ri! Barakalla! 🎉")
+                # To'g'ri topsagina keyingi misolga o'tadi
+                await misol_yuborish(update, context, sinf)
             else:
-                await update.message.reply_text(f"Noto'g'ri ❌\nTo'g'ri javob: {togri}")
-            
-            # Javob bosilishi bilan avtomatik ravishda keyingi misol yuboriladi
-            await misol_yuborish(update, context, sinf)
+                # Noto'g'ri bo'lsa qayta urinishni so'raydi
+                await update.message.reply_text("Noto'g'ri ❌ Qayta urinib ko'ring!")
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
