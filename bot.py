@@ -72,7 +72,7 @@ async def xabar_ishlash(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if foydalanuvchi_javobi == to_g_ri_javob:
                 await update.message.reply_text("Barakalla! Javob to'g'ri! 👏\nYangi misol uchun tugmani bosing.")
                 del context.user_data['to'
-                g
+                
                 'ri_javob']
                 else:
                 await update.message.reply_text("Xato javob, qaytadan urinib ko'ring! ❌")
