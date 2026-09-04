@@ -18,7 +18,7 @@ def run_health_check_server():
 
 threading.Thread(target=run_health_check_server, daemon=True).start()
 # BotFather'dan olgan tokeningizni shu yerga yozing
-TOKEN = "BU_YERGA_TOKENINGIZNI_YOZING"
+TOKEN = "8748063084:AAGAXuyD6krAGeL1ctleC5GMBDiz_jKSN4M"
 
 
 # 1-4 sinflar uchun o'rta darajadagi misol yaratish
