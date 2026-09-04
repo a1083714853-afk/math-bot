@@ -66,7 +66,7 @@ async def xabar_ishlash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             foydalanuvchi_javobi = float(matn.replace(',', '.'))
             to_g_ri_javob = context.user_data['to'
-            g
+            
             'ri_javob']
 
             if foydalanuvchi_javobi == to_g_ri_javob:
