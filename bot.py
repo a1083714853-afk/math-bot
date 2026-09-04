@@ -47,7 +47,7 @@ async def xabar_ishlash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         'ri_javob'] = javob
         await update.message.reply_text(f"Misolni yeching:\n<b>{savol} = ?</b>", parse_mode="HTML")
 
-    elif 'to'g'ri_javob' in context.user_data:
+    elif "to'g'ri_javob" in context.user_data:
         try:
             foydalanuvchi_javobi = float(matn.replace(',', '.'))
             to_g_ri_javob = context.user_data['to'
