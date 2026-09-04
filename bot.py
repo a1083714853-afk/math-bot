@@ -74,7 +74,7 @@ async def xabar_ishlash(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 del context.user_data['to'
                 
                 'ri_javob']
-                else:
+                
                 await update.message.reply_text("Xato javob, qaytadan urinib ko'ring! ❌")
         except ValueError:
             await update.message.reply_text("Iltimos, faqat raqam ko'rinishida javob bering.")
